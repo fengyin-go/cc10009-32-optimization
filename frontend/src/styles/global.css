@@ -35,3 +35,14 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .error-text { color: #b42318; }
 .status-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; font-size: 12px; color: var(--muted); }
 .legend-item { background: #eef2f7; border-radius: 999px; padding: 2px 10px; }
+.panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-top: 16px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+.panel-head h3 { font-size: 15px; margin: 0; }
+.panel-actions { display: flex; gap: 8px; align-items: center; }
+.banner { font-size: 13px; background: #eef6ee; border: 1px solid #b7dfb7; color: #1f5130; border-radius: 6px; padding: 8px 10px; margin: 0 0 10px; }
+.banner.error { background: #fdf0ef; border-color: #f0b8b3; color: #8a1f14; }
+.hint { font-size: 12px; color: var(--muted); }
+.file-pick, .file-link { cursor: pointer; position: relative; overflow: hidden; }
+.file-pick input, .file-link input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-pick span { border: 1px solid var(--border); background: #fff; border-radius: 6px; padding: 6px 12px; display: inline-block; }
+select { border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; background: #fff; }

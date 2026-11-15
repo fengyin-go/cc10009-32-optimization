@@ -67,6 +67,39 @@
       <span>共 {{ total }} 条字段映射记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <section class="panel">
+      <header class="panel-head">
+        <h3>历史清洗版本快照</h3>
+        <span class="hint">映射清单同步新版本后，旧版本在这里按快照读取，历史结果仍可读</span>
+      </header>
+      <form class="filter-bar" @submit.prevent="loadSnapshot">
+        <label class="filter-item">
+          <span>清洗规则</span>
+          <input v-model="snapshotRule" placeholder="例如 CLEA-74" />
+        </label>
+        <label class="filter-item">
+          <span>版本号</span>
+          <input v-model="snapshotVersion" placeholder="例如 CLEA-74" />
+        </label>
+        <button class="btn" type="submit">读取快照</button>
+      </form>
+      <p v-if="snapshotMessage" class="hint">{{ snapshotMessage }}</p>
+      <table v-if="snapshotRows.length" class="data-table">
+        <thead>
+          <tr>
+            <th v-for="column in columns" :key="column">{{ column }}</th>
+            <th>当前状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in snapshotRows" :key="String(row.id)">
+            <td v-for="column in columns" :key="column">{{ row[column] ?? '—' }}</td>
+            <td>{{ row.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </section>
 </template>
 
@@ -79,10 +112,11 @@ import {
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
+import { mappingSnapshot } from '@/data/cleanse-service'
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('extractor')
-const columns = ["规则编号", "源字段名称", "目标字段名称", "数据类型转换", "默认填充值", "清洗表达式", "必填标识", "唯一性校验"]
+const columns = ["规则编号", "源字段名称", "目标字段名称", "数据类型转换", "默认填充值", "清洗表达式", "必填标识", "唯一性校验", "清洗版本", "映射版本说明"]
 const actions = ["提交校验", "启用规则", "停用规则"]
 const statuses = ["草稿", "待校验", "已启用", "已停用"]
 const stats = [{"label": "映射规则总数", "value": 0}, {"label": "已启用规则", "value": 0}, {"label": "待校验规则", "value": 0}]
@@ -98,6 +132,22 @@ const statusSummary = computed(() =>
     count: rows.value.filter((row) => String(row.status) === status).length,
   })),
 )
+
+const snapshotRule = ref('CLEA-74')
+const snapshotVersion = ref('CLEA-74')
+const snapshotRows = ref<EntryRow[]>([])
+const snapshotMessage = ref('')
+
+function loadSnapshot() {
+  const snapshot = mappingSnapshot(snapshotRule.value.trim(), snapshotVersion.value.trim())
+  if (!snapshot) {
+    snapshotRows.value = []
+    snapshotMessage.value = `没有找到 ${snapshotRule.value}@${snapshotVersion.value} 的映射快照`
+    return
+  }
+  snapshotRows.value = snapshot.rows as EntryRow[]
+  snapshotMessage.value = `快照时间 ${snapshot.capturedAt}，共 ${snapshot.rows.length} 条映射`
+}
 
 function resetFilters() {
   filters.value = {}

@@ -73,6 +73,11 @@ export function exportEntries(key: string): { filename: string; content: string 
 
 export function downloadEntries(key: string): void {
   const { filename, content } = exportEntries(key)
+  downloadText(filename, content)
+}
+
+/** 通用下载：清洗批次的键表、结果文件都走这里。 */
+export function downloadText(filename: string, content: string): void {
   const blob = new Blob([content], { type: 'text/csv;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
